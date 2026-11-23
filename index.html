@@ -1,0 +1,925 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Алхимия понятий: лаборатория лексики</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --чёрный: #0A0A0A;
+  --лайм: #D4FF4F;
+  --розовый: #FF3D8B;
+  --оранжевый: #FF6B2C;
+  --фиолетовый: #8B5CF6;
+  --белый: #FFFFFF;
+  --серый: #1A1A1A;
+}
+
+body {
+  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  background: var(--чёрный);
+  color: var(--белый);
+  min-height: 100vh;
+  overflow-x: hidden;
+  position: relative;
+}
+
+.декор-линия {
+  position: fixed;
+  pointer-events: none;
+  z-index: 1;
+  opacity: 0.6;
+}
+
+.декор-линия-1 {
+  top: 0;
+  left: -50px;
+  width: 200px;
+  height: 100vh;
+}
+
+.декор-линия-2 {
+  top: 0;
+  right: -50px;
+  width: 200px;
+  height: 100vh;
+  transform: scaleX(-1);
+}
+
+.верхняя-панель {
+  background: var(--чёрный);
+  border-bottom: 2px solid var(--лайм);
+  padding: 30px 40px;
+  position: relative;
+  z-index: 10;
+}
+
+.верхняя-панель h1 {
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: clamp(32px, 5vw, 56px);
+  font-weight: 900;
+  line-height: 1;
+  margin-bottom: 12px;
+  letter-spacing: -1px;
+}
+
+.верхняя-панель h1 span {
+  color: var(--лайм);
+  font-style: italic;
+}
+
+.инструкция {
+  font-size: 14px;
+  color: rgba(255,255,255,0.7);
+  margin-bottom: 20px;
+  max-width: 600px;
+  line-height: 1.5;
+}
+
+.верхние-кнопки {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.счётчик {
+  font-family: Georgia, serif;
+  font-size: clamp(40px, 6vw, 64px);
+  font-weight: 900;
+  color: var(--лайм);
+  line-height: 1;
+}
+
+.счётчик small {
+  font-size: 0.4em;
+  color: rgba(255,255,255,0.5);
+  font-family: system-ui, sans-serif;
+  font-weight: 400;
+  margin-left: 8px;
+}
+
+.кнопки-группа {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.кнопка {
+  background: var(--лайм);
+  color: var(--чёрный);
+  border: none;
+  padding: 12px 24px;
+  font-weight: 700;
+  font-size: 13px;
+  cursor: pointer;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  transition: all 0.2s;
+  font-family: inherit;
+}
+
+.кнопка:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(212, 255, 79, 0.3);
+}
+
+.кнопка-розовая { background: var(--розовый); color: var(--белый); }
+.кнопка-розовая:hover { box-shadow: 0 8px 20px rgba(255, 61, 139, 0.4); }
+
+.кнопка-прозрачная {
+  background: transparent;
+  color: var(--белый);
+  border: 2px solid var(--белый);
+}
+
+.кнопка-прозрачная:hover {
+  background: var(--белый);
+  color: var(--чёрный);
+  box-shadow: none;
+}
+
+.панель-элементов {
+  padding: 40px;
+  max-width: 1400px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 10;
+}
+
+.сетка-элементов {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 16px;
+  margin-bottom: 30px;
+}
+
+.карточка-элемента {
+  background: var(--серый);
+  border: 2px solid var(--белый);
+  padding: 20px 16px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.25s;
+  user-select: none;
+  position: relative;
+  min-height: 100px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.карточка-элемента:hover {
+  transform: translateY(-4px);
+  border-color: var(--лайм);
+  box-shadow: 0 8px 24px rgba(212, 255, 79, 0.2);
+}
+
+.карточка-элемента.выбрана {
+  background: var(--лайм);
+  color: var(--чёрный);
+  border-color: var(--лайм);
+  transform: scale(1.05);
+}
+
+.карточка-элемента.выбрана .подсказка-слова {
+  color: rgba(0,0,0,0.6);
+}
+
+.карточка-элемента.перетаскивается {
+  opacity: 0.4;
+}
+
+.карточка-элемента.над-ней {
+  border-color: var(--розовый);
+  background: rgba(255, 61, 139, 0.1);
+}
+
+.название-элемента {
+  font-family: Georgia, serif;
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 6px;
+  line-height: 1.2;
+}
+
+.подсказка-слова {
+  font-size: 11px;
+  color: rgba(255,255,255,0.5);
+  font-style: italic;
+  line-height: 1.3;
+}
+
+.контейнер-кнопки-соединения {
+  text-align: center;
+  margin: 30px 0;
+  min-height: 70px;
+}
+
+.кнопка-соединить {
+  background: var(--розовый);
+  color: var(--белый);
+  padding: 18px 50px;
+  font-size: 18px;
+  font-weight: 900;
+  border: none;
+  cursor: pointer;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  display: none;
+  font-family: inherit;
+  transition: all 0.2s;
+}
+
+.кнопка-соединить.видна {
+  display: inline-block;
+  animation: выезд-вверх 0.3s ease-out;
+}
+
+.кнопка-соединить:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 30px rgba(255, 61, 139, 0.5);
+}
+
+@keyframes выезд-вверх {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.модальное-окно {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.85);
+  z-index: 1000;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  backdrop-filter: blur(8px);
+}
+
+.модальное-окно.активно {
+  display: flex;
+}
+
+.содержимое-модального {
+  background: var(--чёрный);
+  border: 2px solid var(--лайм);
+  padding: 40px;
+  max-width: 650px;
+  width: 100%;
+  max-height: 85vh;
+  overflow-y: auto;
+  position: relative;
+}
+
+.кнопка-закрыть {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  background: var(--лайм);
+  color: var(--чёрный);
+  border: none;
+  width: 40px;
+  height: 40px;
+  cursor: pointer;
+  font-size: 24px;
+  font-weight: 900;
+  font-family: inherit;
+}
+
+.содержимое-модального h2 {
+  font-family: Georgia, serif;
+  font-size: 32px;
+  margin-bottom: 24px;
+  font-weight: 900;
+  line-height: 1.1;
+}
+
+.содержимое-модального h2 span {
+  color: var(--лайм);
+  font-style: italic;
+}
+
+.карточка-открытия {
+  border: 3px solid var(--лайм);
+  padding: 30px;
+  margin: 20px 0;
+  animation: появление-карточки 0.5s ease-out;
+  background: var(--серый);
+}
+
+@keyframes появление-карточки {
+  from { opacity: 0; transform: scale(0.9); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.карточка-открытия h3 {
+  font-family: Georgia, serif;
+  font-size: 40px;
+  color: var(--лайм);
+  margin-bottom: 20px;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.карточка-открытия .рецепт {
+  background: var(--розовый);
+  color: var(--белый);
+  padding: 14px 20px;
+  margin-bottom: 20px;
+  font-weight: 700;
+  font-size: 16px;
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.карточка-открытия .объяснение {
+  line-height: 1.7;
+  font-size: 15px;
+  color: rgba(255,255,255,0.9);
+}
+
+.сетка-книги {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 16px;
+}
+
+.карточка-книги {
+  border: 2px solid var(--белый);
+  padding: 20px;
+  min-height: 130px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  background: var(--серый);
+}
+
+.карточка-книги.открыта {
+  background: var(--фиолетовый);
+  border-color: var(--фиолетовый);
+}
+
+.карточка-книги.закрыта {
+  background: var(--серый);
+  opacity: 0.4;
+}
+
+.карточка-книги h4 {
+  font-family: Georgia, serif;
+  font-size: 22px;
+  margin-bottom: 10px;
+  font-weight: 900;
+}
+
+.карточка-книги .текст-рецепта {
+  font-size: 12px;
+  opacity: 0.8;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.карточка-книги .иконка-замка {
+  font-size: 56px;
+  opacity: 0.3;
+  font-family: Georgia, serif;
+  font-weight: 900;
+}
+
+.уровни-подсказки {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.кнопка-уровня {
+  background: transparent;
+  color: var(--белый);
+  border: 2px solid var(--белый);
+  padding: 10px 20px;
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 13px;
+  text-transform: uppercase;
+  font-family: inherit;
+  transition: all 0.2s;
+}
+
+.кнопка-уровня:hover {
+  background: var(--белый);
+  color: var(--чёрный);
+}
+
+.кнопка-уровня.активна {
+  background: var(--лайм);
+  color: var(--чёрный);
+  border-color: var(--лайм);
+}
+
+.блок-подсказки {
+  background: var(--оранжевый);
+  color: var(--белый);
+  padding: 24px;
+  font-size: 18px;
+  line-height: 1.6;
+  font-weight: 500;
+  border-left: 6px solid var(--лайм);
+}
+
+.финальный-экран {
+  text-align: center;
+}
+
+.финальный-экран h2 {
+  font-size: 48px;
+  margin-bottom: 20px;
+}
+
+.финальный-текст {
+  font-size: 20px;
+  margin-bottom: 30px;
+  color: rgba(255,255,255,0.9);
+  line-height: 1.5;
+}
+
+.уведомление {
+  position: fixed;
+  bottom: 30px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--чёрный);
+  color: var(--белый);
+  padding: 16px 32px;
+  border: 2px solid var(--белый);
+  z-index: 2000;
+  display: none;
+  animation: выезд-вверх 0.3s ease-out;
+  font-weight: 600;
+  max-width: 90%;
+  text-align: center;
+}
+
+.уведомление.видно { display: block; }
+.уведомление.успех { background: var(--лайм); color: var(--чёрный); border-color: var(--лайм); }
+.уведомление.ошибка { background: var(--розовый); color: var(--белый); border-color: var(--розовый); }
+
+@media (max-width: 768px) {
+  .верхняя-панель { padding: 20px; }
+  .панель-элементов { padding: 20px; }
+  .сетка-элементов { grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 10px; }
+  .карточка-элемента { padding: 14px 10px; min-height: 80px; }
+  .название-элемента { font-size: 15px; }
+  .подсказка-слова { font-size: 10px; }
+  .содержимое-модального { padding: 24px; }
+  .карточка-открытия h3 { font-size: 32px; }
+  .декор-линия { display: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+::-webkit-scrollbar { width: 10px; }
+::-webkit-scrollbar-track { background: var(--чёрный); }
+::-webkit-scrollbar-thumb { background: var(--лайм); }
+</style>
+</head>
+<body>
+
+<svg class="декор-линия декор-линия-1" viewBox="0 0 200 1000" preserveAspectRatio="none">
+  <path d="M 100 0 Q 0 200 100 400 T 100 800 T 100 1000" stroke="#D4FF4F" stroke-width="3" fill="none" opacity="0.4"/>
+</svg>
+<svg class="декор-линия декор-линия-2" viewBox="0 0 200 1000" preserveAspectRatio="none">
+  <path d="M 100 0 Q 200 250 100 500 T 100 1000" stroke="#FF3D8B" stroke-width="3" fill="none" opacity="0.3"/>
+</svg>
+
+<div class="верхняя-панель">
+  <h1>АЛХИМИЯ <span>понятий</span></h1>
+  <div class="инструкция">Соединяй два слова — узнай лексическое отношение между ними. Выбери две карточки и нажми «Соединить».</div>
+  <div class="верхние-кнопки">
+    <div class="счётчик"><span id="счётчик-открытий">0</span><small>из <span id="всего-открытий">15</span></small></div>
+    <div class="кнопки-группа">
+      <button class="кнопка кнопка-розовая" id="кнопка-подсказки">💡 Подсказка</button>
+      <button class="кнопка" id="кнопка-книги">📖 Книга</button>
+      <button class="кнопка кнопка-прозрачная" id="кнопка-сброса">↺ Сброс</button>
+    </div>
+  </div>
+</div>
+
+<div class="панель-элементов">
+  <div class="сетка-элементов" id="сетка-элементов"></div>
+  <div class="контейнер-кнопки-соединения">
+    <button class="кнопка-соединить" id="кнопка-соединить">⚗ Соединить</button>
+  </div>
+</div>
+
+<div class="модальное-окно" id="модальное-открытие">
+  <div class="содержимое-модального">
+    <button class="кнопка-закрыть" onclick="закрытьМодальное('модальное-открытие')">×</button>
+    <div id="содержимое-открытия"></div>
+  </div>
+</div>
+
+<div class="модальное-окно" id="модальное-книга">
+  <div class="содержимое-модального">
+    <button class="кнопка-закрыть" onclick="закрытьМодальное('модальное-книга')">×</button>
+    <h2>КНИГА <span>открытий</span></h2>
+    <div class="сетка-книги" id="сетка-книги"></div>
+  </div>
+</div>
+
+<div class="модальное-окно" id="модальное-подсказка">
+  <div class="содержимое-модального">
+    <button class="кнопка-закрыть" onclick="закрытьМодальное('модальное-подсказка')">×</button>
+    <h2>ПОДСКАЗКА</h2>
+    <div class="уровни-подсказки">
+      <button class="кнопка-уровня активна" data-уровень="1">Намёк</button>
+      <button class="кнопка-уровня" data-уровень="2">Слово</button>
+      <button class="кнопка-уровня" data-уровень="3">Рецепт</button>
+    </div>
+    <div class="блок-подсказки" id="содержимое-подсказки"></div>
+  </div>
+</div>
+
+<div class="модальное-окно" id="модальное-финал">
+  <div class="содержимое-модального финальный-экран">
+    <button class="кнопка-закрыть" onclick="закрытьМодальное('модальное-финал')">×</button>
+    <h2>ВСЕ <span>ОТКРЫТО</span> →</h2>
+    <p class="финальный-текст">Ты нашёл все 15 лексических отношений. Отличная работа!</p>
+    <button class="кнопка" onclick="сброситьИгру()">↺ Пройти заново</button>
+  </div>
+</div>
+
+<div class="уведомление" id="уведомление"></div>
+
+<script>
+const ВЕРСИЯ_ДАННЫХ = 'v3_ударения';
+
+const слова = [
+  { id: 'волшебник', название: 'волшебник', подсказка: 'Гарри Поттер' },
+  { id: 'маг', название: 'маг', подсказка: 'творит чудеса' },
+  { id: 'смелый', название: 'смелый', подсказка: 'не боится' },
+  { id: 'бесстрашный', название: 'бесстрашный', подсказка: 'как рыцарь' },
+  { id: 'прекрасный', название: 'прекрасный', подсказка: 'очень красивый' },
+  { id: 'великолепный', название: 'великолепный', подсказка: 'восхитительный' },
+  { id: 'свет', название: 'свет', подсказка: 'тёмная сторона' },
+  { id: 'тьма', название: 'тьма', подсказка: 'противоположность света' },
+  { id: 'друг', название: 'друг', подсказка: 'Рон и Гермиона' },
+  { id: 'враг', название: 'враг', подсказка: 'Волан-де-Морт' },
+  { id: 'одеть', название: 'одеть', подсказка: 'Рона в мантию' },
+  { id: 'надеть', название: 'надеть', подсказка: 'мантию на себя' },
+  { id: 'представить', название: 'представить', подсказка: 'вообразить дракона' },
+  { id: 'предоставить', название: 'предоставить', подсказка: 'дать слово' },
+  { id: 'абонент', название: 'абонент', подсказка: 'владелец совы' },
+  { id: 'абонемент', название: 'абонемент', подсказка: 'карта в квиддич-клуб' },
+  { id: 'пруд', название: 'пруд', подсказка: 'в Хогвартсе' },
+  { id: 'прут', название: 'прут', подсказка: 'для зелья' },
+  { id: 'замок1', название: 'замо́к', подсказка: 'на двери Хогвартса' },
+  { id: 'замок2', название: 'за́мок', подсказка: 'средневековый' },
+  { id: 'мука1', название: 'му́ка', подсказка: 'от заклинания' },
+  { id: 'мука2', название: 'мука́', подсказка: 'для тыквенных пирожков' },
+  { id: 'лечу1', название: 'лечу', подсказка: 'дракона от болезни' },
+  { id: 'лечу2', название: 'лечу', подсказка: 'на метле' },
+  { id: 'коса1', название: 'коса', подсказка: 'у Рапунцель' },
+  { id: 'коса2', название: 'коса', подсказка: 'инструмент' },
+  { id: 'лук1', название: 'лук', подсказка: 'Робин Гуд' },
+  { id: 'лук2', название: 'лук', подсказка: 'овощ' },
+  { id: 'ручка1', название: 'ручка', подсказка: 'дверная' },
+  { id: 'ручка2', название: 'ручка', подсказка: 'для письма' }
+];
+
+const рецепты = [
+  { id: 1, слово1: 'волшебник', слово2: 'маг', результат: 'Синонимы', объяснение: 'Слова имеют близкое значение: волшебник и маг — оба творят чудеса, как Гарри Поттер и Дамблдор.' },
+  { id: 2, слово1: 'смелый', слово2: 'бесстрашный', результат: 'Синонимы', объяснение: 'Слова имеют близкое значение: смелый и бесстрашный — оба не боятся опасности, как настоящие герои.' },
+  { id: 3, слово1: 'прекрасный', слово2: 'великолепный', результат: 'Синонимы', объяснение: 'Слова имеют близкое значение: прекрасный и великолепный — оба обозначают что-то очень красивое.' },
+  { id: 4, слово1: 'свет', слово2: 'тьма', результат: 'Антонимы', объяснение: 'Слова имеют противоположные значения: свет и тьма — вечное противостояние, как светлая и тёмная магия.' },
+  { id: 5, слово1: 'друг', слово2: 'враг', результат: 'Антонимы', объяснение: 'Слова имеют противоположные значения: друг (Рон и Гермиона) и враг (Волан-де-Морт).' },
+  { id: 6, слово1: 'одеть', слово2: 'надеть', результат: 'Паронимы', объяснение: 'Общий корень (де-), но разные приставки (о-/на-). Одеть — кого-то (одеть Рона), надеть — что-то на себя (надеть мантию).' },
+  { id: 7, слово1: 'представить', слово2: 'предоставить', результат: 'Паронимы', объяснение: 'Общий корень (став-), но разные приставки. Представить — вообразить, предоставить — дать возможность.' },
+  { id: 8, слово1: 'абонент', слово2: 'абонемент', результат: 'Паронимы', объяснение: 'Общий корень (абон-), но разные суффиксы (-ент/-емент). Абонент — владелец, абонемент — карта.' },
+  { id: 9, слово1: 'пруд', слово2: 'прут', результат: 'Омофоны', объяснение: 'Звучат одинаково [прут], но пишутся по-разному: пруд — водоём, прут — ветка.' },
+  { id: 10, слово1: 'замок1', слово2: 'замок2', результат: 'Омографы', объяснение: 'Пишутся одинаково "замок", но произносятся по-разному: замо́к (дверной) и за́мок (средневековый).' },
+  { id: 11, слово1: 'мука1', слово2: 'мука2', результат: 'Омографы', объяснение: 'Пишутся одинаково "мука", но произносятся по-разному: му́ка (страдание от заклинания) и мука́ (продукт для пирожков).' },
+  { id: 12, слово1: 'лечу1', слово2: 'лечу2', результат: 'Омоформы', объяснение: 'Совпадают в форме "лечу" (1 лицо, ед. число), но разные начальные формы: лечить и лететь.' },
+  { id: 13, слово1: 'коса1', слово2: 'коса2', результат: 'Полные омонимы', объяснение: 'Звучат и пишутся одинаково "коса", но разные значения: коса (волосы) и коса (инструмент).' },
+  { id: 14, слово1: 'лук1', слово2: 'лук2', результат: 'Полные омонимы', объяснение: 'Звучат и пишутся одинаково "лук", но разные значения: лук (оружие) и лук (овощ).' },
+  { id: 15, слово1: 'ручка1', слово2: 'ручка2', результат: 'Полные омонимы', объяснение: 'Звучат и пишутся одинаково "ручка", но разные значения: ручка (дверная) и ручка (для письма).' }
+];
+
+const подсказки = {
+  1: { 1: 'Эти слова о тех, кто творит чудеса', 2: 'Одно из слов — "волшебник"', 3: 'волшебник + маг → Синонимы' },
+  2: { 1: 'Эти слова о смелых людях', 2: 'Одно из слов — "смелый"', 3: 'смелый + бесстрашный → Синонимы' },
+  3: { 1: 'Эти слова о чём-то очень красивом', 2: 'Одно из слов — "прекрасный"', 3: 'прекрасный + великолепный → Синонимы' },
+  4: { 1: 'Эти слова противоположны по смыслу', 2: 'Одно из слов — "свет"', 3: 'свет + тьма → Антонимы' },
+  5: { 1: 'Эти слова о противоположных ролях', 2: 'Одно из слов — "друг"', 3: 'друг + враг → Антонимы' },
+  6: { 1: 'У этих слов общий корень, но разные приставки', 2: 'Одно из слов — "одеть"', 3: 'одеть + надеть → Паронимы' },
+  7: { 1: 'У этих слов общий корень, но разные приставки', 2: 'Одно из слов — "представить"', 3: 'представить + предоставить → Паронимы' },
+  8: { 1: 'У этих слов общий корень, но разные суффиксы', 2: 'Одно из слов — "абонент"', 3: 'абонент + абонемент → Паронимы' },
+  9: { 1: 'Эти слова звучат одинаково, но пишутся по-разному', 2: 'Одно из слов — "пруд"', 3: 'пруд + прут → Омофоны' },
+  10: { 1: 'Эти слова пишутся одинаково, но произносятся по-разному', 2: 'Одно из слов — "замо́к"', 3: 'замо́к + за́мок → Омографы' },
+  11: { 1: 'Эти слова пишутся одинаково, но произносятся по-разному', 2: 'Одно из слов — "му́ка"', 3: 'му́ка + мука́ → Омографы' },
+  12: { 1: 'Эти слова совпадают в одной форме, но имеют разные начальные формы', 2: 'Оба слова пишутся "лечу"', 3: 'лечу (лечить) + лечу (лететь) → Омоформы' },
+  13: { 1: 'Эти слова звучат и пишутся одинаково, но имеют разные значения', 2: 'Оба слова пишутся "коса"', 3: 'коса (у Рапунцель) + коса (инструмент) → Полные омонимы' },
+  14: { 1: 'Эти слова звучат и пишутся одинаково, но имеют разные значения', 2: 'Оба слова пишутся "лук"', 3: 'лук (Робин Гуд) + лук (овощ) → Полные омонимы' },
+  15: { 1: 'Эти слова звучат и пишутся одинаково, но имеют разные значения', 2: 'Оба слова пишутся "ручка"', 3: 'ручка (дверная) + ручка (для письма) → Полные омонимы' }
+};
+
+let открыто = new Set();
+let выбрано = [];
+let текущийУровеньПодсказки = 1;
+
+function инициализация() {
+  проверитьВерсиюДанных();
+  загрузитьПрогресс();
+  отрисоватьЭлементы();
+  обновитьСчётчик();
+  настроитьСобытия();
+}
+
+function проверитьВерсиюДанных() {
+  try {
+    const версия = localStorage.getItem('алхимия_версия');
+    if (версия !== ВЕРСИЯ_ДАННЫХ) {
+      localStorage.removeItem('алхимия_открыто');
+      localStorage.setItem('алхимия_версия', ВЕРСИЯ_ДАННЫХ);
+    }
+  } catch (ошибка) {
+    // localStorage недоступен
+  }
+}
+
+function загрузитьПрогресс() {
+  try {
+    const сохранено = localStorage.getItem('алхимия_открыто');
+    if (сохранено) {
+      const данные = JSON.parse(сохранено);
+      if (Array.isArray(данные) && данные.every(д => typeof д === 'number')) {
+        открыто = new Set(данные);
+      } else {
+        открыто = new Set();
+        localStorage.removeItem('алхимия_открыто');
+      }
+    }
+  } catch (ошибка) {
+    открыто = new Set();
+  }
+}
+
+function сохранитьПрогресс() {
+  try {
+    localStorage.setItem('алхимия_открыто', JSON.stringify([...открыто]));
+  } catch (ошибка) {
+    // Игнорируем
+  }
+}
+
+function отрисоватьЭлементы() {
+  const сетка = document.getElementById('сетка-элементов');
+  сетка.innerHTML = '';
+  слова.forEach(слово => {
+    сетка.appendChild(создатьКарточкуЭлемента(слово));
+  });
+}
+
+function создатьКарточкуЭлемента(слово) {
+  const карточка = document.createElement('div');
+  карточка.className = 'карточка-элемента';
+  карточка.dataset.id = слово.id;
+  карточка.innerHTML = `
+    <div class="название-элемента">${слово.название}</div>
+    ${слово.подсказка ? `<div class="подсказка-слова">${слово.подсказка}</div>` : ''}
+  `;
+
+  карточка.draggable = true;
+  карточка.addEventListener('dragstart', обработкаНачалаПеретаскивания);
+  карточка.addEventListener('dragover', обработкаНаведения);
+  карточка.addEventListener('dragleave', обработкаУхода);
+  карточка.addEventListener('drop', обработкаСброса);
+  карточка.addEventListener('dragend', обработкаКонцаПеретаскивания);
+
+  карточка.addEventListener('click', () => обработкаКликаПоКарточке(слово.id));
+
+  return карточка;
+}
+
+let перетаскиваемыйЭлемент = null;
+
+function обработкаНачалаПеретаскивания(е) {
+  перетаскиваемыйЭлемент = this.dataset.id;
+  this.classList.add('перетаскивается');
+  е.dataTransfer.effectAllowed = 'move';
+}
+
+function обработкаНаведения(е) {
+  е.preventDefault();
+  е.dataTransfer.dropEffect = 'move';
+  this.classList.add('над-ней');
+}
+
+function обработкаУхода() {
+  this.classList.remove('над-ней');
+}
+
+function обработкаСброса(е) {
+  е.preventDefault();
+  this.classList.remove('над-ней');
+  const целевойЭлемент = this.dataset.id;
+  if (перетаскиваемыйЭлемент && целевойЭлемент && перетаскиваемыйЭлемент !== целевойЭлемент) {
+    попробоватьСоединить(перетаскиваемыйЭлемент, целевойЭлемент);
+  }
+}
+
+function обработкаКонцаПеретаскивания() {
+  this.classList.remove('перетаскивается');
+  перетаскиваемыйЭлемент = null;
+}
+
+function обработкаКликаПоКарточке(id) {
+  const карточка = document.querySelector(`[data-id="${id}"]`);
+
+  if (выбрано.includes(id)) {
+    выбрано = выбрано.filter(э => э !== id);
+    карточка.classList.remove('выбрана');
+  } else {
+    if (выбрано.length < 2) {
+      выбрано.push(id);
+      карточка.classList.add('выбрана');
+    }
+  }
+
+  обновитьКнопкуСоединения();
+}
+
+function обновитьКнопкуСоединения() {
+  const кнопка = document.getElementById('кнопка-соединить');
+  if (выбрано.length === 2) {
+    кнопка.classList.add('видна');
+  } else {
+    кнопка.classList.remove('видна');
+  }
+}
+
+function попробоватьСоединить(id1, id2) {
+  const рецепт = рецепты.find(р =>
+    (р.слово1 === id1 && р.слово2 === id2) ||
+    (р.слово1 === id2 && р.слово2 === id1)
+  );
+
+  if (рецепт) {
+    if (открыто.has(рецепт.id)) {
+      показатьУведомление('Это отношение уже открыто. Ищи новую пару!', 'ошибка');
+    } else {
+      открытьОткрытие(рецепт);
+    }
+  } else {
+    показатьУведомление('Между этими словами нет нужного отношения. Попробуй другую пару!', 'ошибка');
+  }
+
+  выбрано = [];
+  document.querySelectorAll('.карточка-элемента').forEach(к => к.classList.remove('выбрана'));
+  обновитьКнопкуСоединения();
+}
+
+function открытьОткрытие(рецепт) {
+  открыто.add(рецепт.id);
+  сохранитьПрогресс();
+  обновитьСчётчик();
+
+  const содержимое = document.getElementById('содержимое-открытия');
+  содержимое.innerHTML = `
+    <div class="карточка-открытия">
+      <h3>${рецепт.результат}</h3>
+      <div class="рецепт">${рецепт.слово1} + ${рецепт.слово2}</div>
+      <div class="объяснение">${рецепт.объяснение}</div>
+    </div>
+  `;
+
+  document.getElementById('модальное-открытие').classList.add('активно');
+
+  if (открыто.size === рецепты.length) {
+    setTimeout(() => показатьФинальныйЭкран(), 2500);
+  }
+}
+
+function обновитьСчётчик() {
+  document.getElementById('счётчик-открытий').textContent = открыто.size;
+  document.getElementById('всего-открытий').textContent = рецепты.length;
+}
+
+function показатьУведомление(сообщение, тип = '') {
+  const увед = document.getElementById('уведомление');
+  увед.textContent = сообщение;
+  увед.className = 'уведомление видно ' + тип;
+  setTimeout(() => {
+    увед.classList.remove('видно');
+  }, 2500);
+}
+
+function закрытьМодальное(id) {
+  document.getElementById(id).classList.remove('активно');
+}
+
+function показатьКнигу() {
+  const сетка = document.getElementById('сетка-книги');
+  сетка.innerHTML = '';
+
+  рецепты.forEach(рецепт => {
+    const карточка = document.createElement('div');
+    карточка.className = 'карточка-книги ' + (открыто.has(рецепт.id) ? 'открыта' : 'закрыта');
+
+    if (открыто.has(рецепт.id)) {
+      карточка.innerHTML = `
+        <h4>${рецепт.результат}</h4>
+        <div class="текст-рецепта">${рецепт.слово1} + ${рецепт.слово2}</div>
+      `;
+    } else {
+      карточка.innerHTML = `<div class="иконка-замка">?</div>`;
+    }
+
+    сетка.appendChild(карточка);
+  });
+
+  document.getElementById('модальное-книга').classList.add('активно');
+}
+
+function показатьПодсказку() {
+  const неоткрытое = рецепты.find(р => !открыто.has(р.id));
+  if (!неоткрытое) {
+    document.getElementById('содержимое-подсказки').textContent = 'Все отношения уже открыты!';
+  } else {
+    обновитьСодержимоеПодсказки(неоткрытое.id);
+  }
+  document.getElementById('модальное-подсказка').classList.add('активно');
+}
+
+function обновитьСодержимоеПодсказки(idРецепта) {
+  const подсказка = подсказки[idРецепта];
+  document.getElementById('содержимое-подсказки').textContent = подсказка[текущийУровеньПодсказки];
+}
+
+function показатьФинальныйЭкран() {
+  document.getElementById('модальное-финал').classList.add('активно');
+}
+
+function сброситьИгру() {
+  if (confirm('Сбросить весь прогресс?')) {
+    открыто.clear();
+    сохранитьПрогресс();
+    обновитьСчётчик();
+    закрытьМодальное('модальное-финал');
+    показатьУведомление('Прогресс сброшен', 'успех');
+  }
+}
+
+function настроитьСобытия() {
+  document.getElementById('кнопка-соединить').addEventListener('click', () => {
+    if (выбрано.length === 2) {
+      попробоватьСоединить(выбрано[0], выбрано[1]);
+    }
+  });
+
+  document.getElementById('кнопка-книги').addEventListener('click', показатьКнигу);
+  document.getElementById('кнопка-подсказки').addEventListener('click', показатьПодсказку);
+  document.getElementById('кнопка-сброса').addEventListener('click', сброситьИгру);
+
+  document.querySelectorAll('.кнопка-уровня').forEach(кнопка => {
+    кнопка.addEventListener('click', () => {
+      document.querySelectorAll('.кнопка-уровня').forEach(к => к.classList.remove('активна'));
+      кнопка.classList.add('активна');
+      текущийУровеньПодсказки = parseInt(кнопка.dataset.уровень);
+
+      const неоткрытое = рецепты.find(р => !открыто.has(р.id));
+      if (неоткрытое) {
+        обновитьСодержимоеПодсказки(неоткрытое.id);
+      }
+    });
+  });
+
+  document.querySelectorAll('.модальное-окно').forEach(модалка => {
+    модалка.addEventListener('click', (е) => {
+      if (е.target === модалка) {
+        модалка.classList.remove('активно');
+      }
+    });
+  });
+}
+
+инициализация();
+</script>
+</body>
+</html>
